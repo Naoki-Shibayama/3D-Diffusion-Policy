@@ -9,7 +9,6 @@ from termcolor import cprint
 import copy
 import time
 
-from diffusion_policy_3d.model.common.normalizer import LinearNormalizer
 from diffusion_policy_3d.policy.base_policy import BasePolicy
 from diffusion_policy_3d.model.diffusion.conditional_unet1d import ConditionalUnet1D
 from diffusion_policy_3d.model.diffusion.mask_generator import LowdimMaskGenerator
@@ -114,7 +113,6 @@ class DP3(BasePolicy):
             action_visible=False
         )
         
-        self.normalizer = LinearNormalizer()
         self.horizon = horizon
         self.obs_feature_dim = obs_feature_dim
         self.action_dim = action_dim
@@ -178,8 +176,7 @@ class DP3(BasePolicy):
         obs_dict: must include "obs" key
         result: must include "action" key
         """
-        # normalize input
-        nobs = self.normalizer.normalize(obs_dict)
+        nobs = obs_dict
         # this_n_point_cloud = nobs['imagin_robot'][..., :3] # only use coordinate
         if not self.use_pc_color:
             nobs['point_cloud'] = nobs['point_cloud'][..., :3]
@@ -252,14 +249,10 @@ class DP3(BasePolicy):
         return result
 
     # ========= training  ============
-    def set_normalizer(self, normalizer: LinearNormalizer):
-        self.normalizer.load_state_dict(normalizer.state_dict())
-
     def compute_loss(self, batch):
-        # normalize input
 
-        nobs = self.normalizer.normalize(batch['obs'])
-        nactions = self.normalizer['action'].normalize(batch['action'])
+        nobs = batch['obs']
+        nactions = batch['action']
 
         if not self.use_pc_color:
             nobs['point_cloud'] = nobs['point_cloud'][..., :3]
