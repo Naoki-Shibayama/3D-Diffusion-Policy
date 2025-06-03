@@ -5,7 +5,6 @@ import torchvision
 import copy
 
 from typing import Optional, Dict, Tuple, Union, List, Type
-from termcolor import cprint
 
 
 def create_mlp(
@@ -72,8 +71,8 @@ class PointNetEncoderXYZRGB(nn.Module):
         """
         super().__init__()
         block_channel = [64, 128, 256, 512]
-        cprint("pointnet use_layernorm: {}".format(use_layernorm), 'cyan')
-        cprint("pointnet use_final_norm: {}".format(final_norm), 'cyan')
+        print("pointnet use_layernorm: {}".format(use_layernorm))
+        print("pointnet use_final_norm: {}".format(final_norm))
         
         self.mlp = nn.Sequential(
             nn.Linear(in_channels, block_channel[0]),
@@ -128,10 +127,10 @@ class PointNetEncoderXYZ(nn.Module):
         """
         super().__init__()
         block_channel = [64, 128, 256]
-        cprint("[PointNetEncoderXYZ] use_layernorm: {}".format(use_layernorm), 'cyan')
-        cprint("[PointNetEncoderXYZ] use_final_norm: {}".format(final_norm), 'cyan')
+        print("[PointNetEncoderXYZ] use_layernorm: {}".format(use_layernorm))
+        print("[PointNetEncoderXYZ] use_final_norm: {}".format(final_norm))
         
-        assert in_channels == 3, cprint(f"PointNetEncoderXYZ only supports 3 channels, but got {in_channels}", "red")
+        assert in_channels == 3, print(f"PointNetEncoderXYZ only supports 3 channels, but got {in_channels}")
        
         self.mlp = nn.Sequential(
             nn.Linear(in_channels, block_channel[0]),
@@ -159,7 +158,7 @@ class PointNetEncoderXYZ(nn.Module):
         self.use_projection = use_projection
         if not use_projection:
             self.final_projection = nn.Identity()
-            cprint("[PointNetEncoderXYZ] not use projection", "yellow")
+            print("[PointNetEncoderXYZ] not use projection")
             
         VIS_WITH_GRAD_CAM = False
         if VIS_WITH_GRAD_CAM:
@@ -228,9 +227,9 @@ class DP3Encoder(nn.Module):
             
         
         
-        cprint(f"[DP3Encoder] point cloud shape: {self.point_cloud_shape}", "yellow")
-        cprint(f"[DP3Encoder] state shape: {self.state_shape}", "yellow")
-        cprint(f"[DP3Encoder] imagination point shape: {self.imagination_shape}", "yellow")
+        print(f"[DP3Encoder] point cloud shape: {self.point_cloud_shape}")
+        print(f"[DP3Encoder] state shape: {self.state_shape}")
+        print(f"[DP3Encoder] imagination point shape: {self.imagination_shape}")
         
 
         self.use_pc_color = use_pc_color
@@ -257,12 +256,12 @@ class DP3Encoder(nn.Module):
         self.n_output_channels  += output_dim
         self.state_mlp = nn.Sequential(*create_mlp(self.state_shape[0], output_dim, net_arch, state_mlp_activation_fn))
 
-        cprint(f"[DP3Encoder] output dim: {self.n_output_channels}", "red")
+        print(f"[DP3Encoder] output dim: {self.n_output_channels}")
 
 
     def forward(self, observations: Dict) -> torch.Tensor:
         points = observations[self.point_cloud_key]
-        assert len(points.shape) == 3, cprint(f"point cloud shape: {points.shape}, length should be 3", "red")
+        assert len(points.shape) == 3, print(f"point cloud shape: {points.shape}, length should be 3")
         if self.use_imagined_robot:
             img_points = observations[self.imagination_key][..., :points.shape[-1]] # align the last dim
             points = torch.concat([points, img_points], dim=1)

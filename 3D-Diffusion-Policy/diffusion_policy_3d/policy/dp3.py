@@ -5,7 +5,6 @@ import torch.nn as nn
 import torch.nn.functional as F
 from einops import rearrange, reduce
 from diffusers.schedulers.scheduling_ddpm import DDPMScheduler
-from termcolor import cprint
 import copy
 import time
 
@@ -80,8 +79,8 @@ class DP3(BasePolicy):
 
         self.use_pc_color = use_pc_color
         self.pointnet_type = pointnet_type
-        cprint(f"[DiffusionUnetHybridPointcloudPolicy] use_pc_color: {self.use_pc_color}", "yellow")
-        cprint(f"[DiffusionUnetHybridPointcloudPolicy] pointnet_type: {self.pointnet_type}", "yellow")
+        print(f"[DiffusionUnetHybridPointcloudPolicy] use_pc_color: {self.use_pc_color}")
+        print(f"[DiffusionUnetHybridPointcloudPolicy] pointnet_type: {self.pointnet_type}")
 
 
 

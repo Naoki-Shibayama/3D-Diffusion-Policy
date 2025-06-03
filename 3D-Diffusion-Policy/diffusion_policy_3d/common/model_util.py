@@ -1,4 +1,4 @@
-from termcolor import cprint
+
 
 def print_params(model):
     """
@@ -14,9 +14,9 @@ def print_params(model):
             params_dict[part_name] = 0
         params_dict[part_name] += param.numel()
 
-    cprint(f'----------------------------------', 'cyan')
-    cprint(f'Class name: {model.__class__.__name__}', 'cyan')
-    cprint(f'  Number of parameters: {all_num_param / 1e6:.4f}M', 'cyan')
+    print(f'----------------------------------')
+    print(f'Class name: {model.__class__.__name__}')
+    print(f'  Number of parameters: {all_num_param / 1e6:.4f}M')
     for part_name, num_params in params_dict.items():
-        cprint(f'   {part_name}: {num_params / 1e6:.4f}M ({num_params / all_num_param:.2%})', 'cyan')
-    cprint(f'----------------------------------', 'cyan')
+        print(f'   {part_name}: {num_params / 1e6:.4f}M ({num_params / all_num_param:.2%})')
+    print(f'----------------------------------')
