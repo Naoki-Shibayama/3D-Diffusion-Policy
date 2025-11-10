@@ -214,16 +214,22 @@ class DP3Encoder(nn.Module):
         self.imagination_key = 'imagin_robot'
         self.state_key = 'state'
         self.point_cloud_key = 'point_cloud'
+        self.tactile_key = 'tactile'
         self.rgb_image_key = 'image'
         self.n_output_channels = out_channel
         
         self.use_imagined_robot = self.imagination_key in observation_space.keys()
+        self.use_tactile = self.tactile_key in observation_space.keys()
         self.point_cloud_shape = observation_space[self.point_cloud_key]
         self.state_shape = observation_space[self.state_key]
         if self.use_imagined_robot:
             self.imagination_shape = observation_space[self.imagination_key]
         else:
             self.imagination_shape = None
+        if self.use_tactile:
+            self.tactile_shape = observation_space[self.tactile_key]
+        else:
+            self.tactile_shape = None
             
         
         
@@ -255,6 +261,9 @@ class DP3Encoder(nn.Module):
 
         self.n_output_channels  += output_dim
         self.state_mlp = nn.Sequential(*create_mlp(self.state_shape[0], output_dim, net_arch, state_mlp_activation_fn))
+        if self.use_tactile:
+            self.tactile_mlp = nn.Sequential(*create_mlp(self.tactile_shape[0], output_dim, net_arch, state_mlp_activation_fn))
+            self.n_output_channels += output_dim
 
         print(f"[DP3Encoder] output dim: {self.n_output_channels}")
 
@@ -272,7 +281,12 @@ class DP3Encoder(nn.Module):
             
         state = observations[self.state_key]
         state_feat = self.state_mlp(state)  # B * 64
-        final_feat = torch.cat([pn_feat, state_feat], dim=-1)
+        if self.use_tactile:
+            tactile = observations[self.tactile_key]
+            tactile_feat = self.tactile_mlp(tactile)
+            final_feat = torch.cat([pn_feat, state_feat, tactile_feat], dim=-1)
+        else:
+            final_feat = torch.cat([pn_feat, state_feat], dim=-1)
         return final_feat
 
 
